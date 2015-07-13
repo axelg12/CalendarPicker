@@ -26,6 +26,7 @@ var Day = React.createClass({
   propTypes: {
     onDayChange: React.PropTypes.func,
     selected: React.PropTypes.bool,
+    disabledDay: React.PropTypes.bool,
     day: React.PropTypes.oneOfType([
         React.PropTypes.number,
         React.PropTypes.string
@@ -45,6 +46,19 @@ var Day = React.createClass({
               style={styles.dayButton}
               onPress={() => this.props.onDayChange(this.props.day) }>
               <Text style={styles.dayLabel}>
+                {this.props.day}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    } else if (this.props.disabledDay) {
+      return (
+        <View style={styles.dayWrapper}>
+          <View>
+            <TouchableOpacity
+              style={styles.dayButton}>
+              <Text style={styles.disabledDay}>
                 {this.props.day}
               </Text>
             </TouchableOpacity>
@@ -98,7 +112,7 @@ var Days = React.createClass({
     }
 
     this.setState({
-      selectedStates: selectedStates,
+      selectedStates: selectedStates
     });
 
   },
@@ -119,22 +133,33 @@ var Days = React.createClass({
       j,
       month = this.props.month,
       year = this.props.year,
+      minDate = this.props.minDate,
+      maxDate = this.props.maxDate,
       currentDay = 0,
       thisMonthFirstDay = new Date(year, month, 1),
       slotsAccumulator = 0;
-
     for(i = 0; i < MAX_ROWS; i++ ) { // Week rows
       columns = [];
 
       for(j = 0; j < MAX_COLUMNS; j++) { // Day columns
         if (slotsAccumulator >= thisMonthFirstDay.getDay()) {
+          var calendarDate = new Date(year, month, currentDay+1);
           if (currentDay < getDaysInMonth(month, year)) {
-            columns.push(<Day
-                      key={j}
-                      day={currentDay+1}
-                      selected={this.state.selectedStates[currentDay]}
-                      date={this.props.date}
-                      onDayChange={this.onPressDay} />);
+            if (minDate <= calendarDate) {
+              columns.push(<Day
+                        key={j}
+                        day={currentDay+1}
+                        selected={this.state.selectedStates[currentDay]}
+                        date={this.props.date}
+                        onDayChange={this.onPressDay} />);
+            } else {
+              // TODO do some styling
+              columns.push(<Day
+                        key={j}
+                        day={currentDay+1}
+                        disabledDay={true}
+                        date={this.props.date} />);
+            }
             currentDay++;
           }
         } else {
@@ -199,7 +224,7 @@ var HeaderControls = React.createClass({
     if (prev < 0) {
       prev = 11;
       this.props.getPrevYear(prev);
-    } 
+    }
 
     this.setState({ selectedMonth: prev });
     this.props.onMonthChange(prev);
@@ -232,6 +257,9 @@ var HeaderControls = React.createClass({
 var CalendarPicker = React.createClass({
   propTypes: {
     selectedDate: React.PropTypes.instanceOf(Date).isRequired,
+    minDate: React.PropTypes.instanceOf(Date),
+    maxDate: React.PropTypes.instanceOf(Date),
+    display: React.PropTypes.bool,
     onDateChange: React.PropTypes.func
   },
   getDefaultProps() {
@@ -245,6 +273,8 @@ var CalendarPicker = React.createClass({
       day: this.props.selectedDate.getDate(),
       month: this.props.selectedDate.getMonth(),
       year: this.props.selectedDate.getFullYear(),
+      minDate: new Date(),
+      maxDate: this.props.maxDate,
       selectedDay: [],
     };
   },
@@ -289,6 +319,8 @@ var CalendarPicker = React.createClass({
   },
 
   render() {
+    console.log('render');
+    if (!this.props.display) return null;
     return (
       <View style={styles.calendar}>
         <HeaderControls
@@ -304,6 +336,8 @@ var CalendarPicker = React.createClass({
           month={this.state.month}
           year={this.state.year}
           date={this.state.date}
+          minDate={this.state.minDate}
+          maxDate={this.state.maxDate}
           onDayChange={this.onDayChange} />
       </View>
     );

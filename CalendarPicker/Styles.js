@@ -31,6 +31,13 @@ var styles = StyleSheet.create({
     alignSelf: 'center'
   },
 
+  disabledDay: {
+    fontSize: 14,
+    color: '#8c8c8c',
+    marginTop: 6,
+    alignSelf: 'center'
+  },
+
   dayLabel: {
     fontSize: 14,
     color: '#000',
@@ -77,7 +84,7 @@ var styles = StyleSheet.create({
   },
 
   headerWrapper: {
-    alignItems: 'center',  
+    alignItems: 'center',
     flexDirection: 'row',
     alignSelf: 'center',
     marginBottom: 10,

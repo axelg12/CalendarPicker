@@ -30,6 +30,9 @@ var Calendar = React.createClass({
     return (
       <View style={styles.container}>
         <CalendarPicker selectedDate={this.state.date}
+          minDate={new Date()}
+          maxDate={new Date('2015-12-24')}
+          display={true}
           onDateChange={this.onDateChange} />
 
         <Text style={styles.selectedDate}>
